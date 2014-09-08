@@ -1,0 +1,40 @@
+################Static Library libdscuda_tcp.a
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE	:= dscuda_tcp
+
+LOCAL_CFLAGS := -O0 -g -ffast-math -funroll-loops -I. -I/usr/local/cuda/include \
+-I/usr/local/cuda/NVIDIA_GPU_Computing_SDK/C/common/inc \
+-I/usr/local/cuda/NVIDIA_GPU_Computing_SDK/common/inc -DTCP_ONLY=1
+LOCAL_SRC_FILES :=	dscudaverb.cpp dscudautil.cpp sockutil.c libdscuda_tcp.cpp \
+LOCAL_LDLIBS := -ldl -llog
+include $(BUILD_STATIC_LIBRARY)
+################Static Library DS-CUDA Routine
+include $(CLEAR_VARS)
+
+LOCAL_MODULE	:= MR3call
+
+LOCAL_CFLAGS := -O0 -g -P -ffast-math -funroll-loops -fpermissive -I. -I/usr/local/cuda/include \
+-I/usr/local/cuda/NVIDIA_GPU_Computing_SDK/C/common/inc \
+-I/usr/local/cuda/NVIDIA_GPU_Computing_SDK/common/inc -DTCP_ONLY=1
+
+LOCAL_SRC_FILES :=  mr3.cpp
+LOCAL_STATIC_LIBRARIES := dscuda_tcp
+LOCAL_LDLIBS := -ldl -llog 
+include $(BUILD_STATIC_LIBRARY)
+################Compile Claret main program
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := claret
+
+LOCAL_CFLAGS := -g -W -DANDROID_NDK -DDISABLE_IMPORTGL 
+
+LOCAL_SRC_FILES := \
+    claret.c \
+    app-android.cpp \
+
+LOCAL_STATIC_LIBRARIES := MR3call
+LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog
+
+include $(BUILD_SHARED_LIBRARY)
